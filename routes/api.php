@@ -17,21 +17,27 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-Route::post('/auth/login', [AuthController::class, 'loginUser']);
-Route::post('/auth/register', [AuthController::class, 'createUser']);
-Route::post('/auth/logout', [AuthController::class, 'logoutUser'])
-    ->middleware('apiauthenticated');
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', [AuthController::class, 'loginUser']);
+    Route::post('register', [AuthController::class, 'createUser']);
+    Route::post('logout', [AuthController::class, 'logoutUser'])
+        ->middleware('apiauthenticated');
+});
 
 Route::middleware(['apiauthenticated'])->group(function () {
-    Route::post('/user/edit-details', [UserController::class, "editDetails"]);
-    Route::post('/user/change-password', [UserController::class, "changePassword"]);
-    Route::post('/user/delete-profile', [UserController::class, "deleteProfile"]);
+    Route::group(['prefix' => 'user'], function () {
+        Route::post('edit-details', [UserController::class, "editDetails"]);
+        Route::post('change-password', [UserController::class, "changePassword"]);
+        Route::post('delete-profile', [UserController::class, "deleteProfile"]);
+    });
 });
 
 Route::middleware(['apiauthenticated', 'accessroleapi'])->group(function () {
-    Route::post('/admin/edit-user-role', [AdminController::class, "editUserRole"]);
-    Route::post('/admin/create-role', [AdminController::class, "createRole"]);
-    Route::delete('/admin/delete-role', [AdminController::class, "deleteRole"]);
-    Route::post('/admin/add-user', [AdminController::class, "addUser"]);
-    Route::delete('/admin/delete-user', [AdminController::class, "deleteUser"]);
+    Route::group(['prefix' => 'admin'], function () {
+        Route::post('edit-user-role', [AdminController::class, "editUserRole"]);
+        Route::post('create-role', [AdminController::class, "createRole"]);
+        Route::delete('delete-role', [AdminController::class, "deleteRole"]);
+        Route::post('add-user', [AdminController::class, "addUser"]);
+        Route::delete('delete-user', [AdminController::class, "deleteUser"]);
+    });
 });
